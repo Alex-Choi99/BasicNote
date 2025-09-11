@@ -15,26 +15,47 @@ body {
     width: 60px;
 }
 
+.home-item {
+    position: relative;
+    height: auto;
+    width: 60px;
+    margin-bottom: 10px;
+}
+
+
 .note-container {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    flex-grow: 1;
     flex-direction: column;
-    height: 75vh;
+    height: 50vh;
+    max-height: 50vh;
     width: 75vw;
     background-color: lightgray;
     position: relative;
     border: 1px solid black;
+    padding: 10px;
+    overflow-y: auto;
+    align-items: flex-start;
 }
+
+.note-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+textarea {
+    width: 100%;
+    min-height: 150px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
 
 .add-note-button {
-    position: relative;
-    bottom: 10px;
-    left: 10px;
-    transform: translateX(-50%);
-}
-
-#AddNote {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
+    align-self: flex-start;
+    width: 60px;
 }
