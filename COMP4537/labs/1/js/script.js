@@ -55,20 +55,19 @@ class Note {
  */
 function addNote() {
     const newNote = new Note();
-
     notes.push(newNote);
-    // insert a new div containing textarea and remove button into NoteContainer as a new row of the grid
-    const noteElement = createNoteElement();
+    const noteElement = createNoteElement(newNote.ID, newNote.content);
     noteContainer.insertBefore(noteElement, addNoteButton);
     saveNotes();
 }
 
 /**
  * Create a note element with textarea and remove button
- * @param {*} noteContent | default to empty string
+ * @param {number} noteID - The unique ID of the note
+ * @param {string} noteContent - The content of the note (default empty string)
  * @returns {HTMLElement} noteItem
  */
-function createNoteElement(noteContent = '') {
+function createNoteElement(noteID, noteContent = '') {
     const noteItem = document.createElement('div');
     noteItem.classList.add('note-item');
 
@@ -80,7 +79,7 @@ function createNoteElement(noteContent = '') {
     removeButton.classList.add('remove-button');
 
     removeButton.addEventListener('click', () => {
-        const index = notes.findIndex(note => note.content === textarea.value);
+        const index = notes.findIndex(note => note.ID === noteID);
         if (index > -1) {
             notes.splice(index, 1);
             saveNotes();
@@ -89,7 +88,7 @@ function createNoteElement(noteContent = '') {
     });
 
     textarea.addEventListener('input', () => {
-        const index = notes.findIndex(note => note.content === noteContent);
+        const index = notes.findIndex(note => note.ID === noteID);
         if (index > -1) {
             notes[index].content = textarea.value;
         }
@@ -109,11 +108,12 @@ function loadNotes() {
     if (storedNotes) {
         notes = JSON.parse(storedNotes);
         notes.forEach(note => {
-            const noteElement = createNoteElement(note.content);
+            const noteElement = createNoteElement(note.ID, note.content);
             noteContainer.insertBefore(noteElement, addNoteButton);
         });
     }
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
     addNoteButton?.addEventListener('click', addNote);
