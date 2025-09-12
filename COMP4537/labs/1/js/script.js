@@ -29,7 +29,10 @@ if (clearNotesButton) {
     clearNotesButton.addEventListener('click', () => {
         localStorage.removeItem('notes');
         notes = [];
-        noteContainer.innerHTML = '';
+        
+        while (noteContainer.firstChild && noteContainer.firstChild !== addNoteButton) {
+            noteContainer.removeChild(noteContainer.firstChild);
+        }
     });
 }
 
