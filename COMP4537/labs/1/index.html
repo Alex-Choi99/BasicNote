@@ -9,11 +9,16 @@
         </title>
     </head>
     <body>
-        <!-- A simple 2 labels and buttons hyperlinked to the writer.html and reader.html-->
-        <label class="home-item" for="writer">Writer:</label>
-        <button class="home-item" onclick="location.href='writer.html'">Writer</button>
-        
-        <label class="home-item" for="reader">Reader:</label>
-        <button class="home-item" onclick="location.href='reader.html'">Reader</button>
+        <div class="home">
+            <div class="home-item">
+                <label class="home-item" for="writer">Writer</label>
+                <button id="WriterButton" class="button-in-home">Writer</button>
+            </div>
+            <div class="home-item">
+                <label class="home-item" for="reader">Reader</label>
+                <button id="ReaderButton" class="button-in-home">Reader</button>
+            </div>
+        </div>
     </body>
+    <script src="js/script.js" type="module"></script>
 </html>

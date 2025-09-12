@@ -7,6 +7,29 @@ body {
     height: 100vh;
 }
 
+.home {
+    display: flex;
+    /* flex-direction: column; */
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    gap: 10px;
+}
+
+.home-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-width: 100px;
+    background-color: #00d4ca;
+}
+
+.button-in-home {
+    background-color: aqua;
+}
+
 .back-button {
     position: absolute;
     bottom: 10px;
