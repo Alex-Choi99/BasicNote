@@ -1,39 +1,20 @@
-const backButton = document.getElementById("BackButton");
-const readerButton = document.getElementById("ReaderButton");
-const writerButton = document.getElementById("WriterButton");
-const noteContainer = document.getElementById('NoteContainer');
-const addNoteButton = document.getElementById('AddNote');
-const lastSavedTimeElement = document.getElementById('last-saved-time');
-const setIntervalTime = 2000;
+/**
+ * Alex Choi A01323994
+ */
 
-let notes = [];
-
-function saveNotes() {
-    localStorage.setItem('notes', JSON.stringify(notes));
-    lastSavedTimeElement.textContent = `Last saved: ${new Date().toLocaleTimeString()}`;
-}
-
-// A button that appears when holding Ctrl key. When clicked, removes all localstorage notes.
-const clearNotesButton = document.getElementById('ClearNotesButton');
-if (clearNotesButton) {
-    clearNotesButton.style.display = 'none'; // Initially hidden
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Control') {
-            clearNotesButton.style.display = 'block';
+/**
+ * Note class representing a single note
+ */
+class Button {
+    constructor(id, onClick) {
+        this.button = document.getElementById(id);
+        if (this.button && onClick) {
+            this.button.addEventListener('click', onClick);
         }
-        if (event.key === 'Escape') {
-            clearNotesButton.style.display = 'none';
-        }
-    });
-
-    clearNotesButton.addEventListener('click', () => {
-        localStorage.removeItem('notes');
-        notes = [];
-        
-        while (noteContainer.firstChild && noteContainer.firstChild !== addNoteButton) {
-            noteContainer.removeChild(noteContainer.firstChild);
-        }
-    });
+    }
+    show() { if (this.button) this.button.style.display = 'block'; }
+    hide() { if (this.button) this.button.style.display = 'none'; }
+    get element() { return this.button; }
 }
 
 /**
@@ -48,6 +29,37 @@ class Note {
         this.content = '';
         this.lastEditDate = new Date();
     }
+}
+
+const backButton = new Button("BackButton", () => window.location.href = "index.html");
+const readerButton = new Button("ReaderButton", () => window.location.href = "reader.html");
+const writerButton = new Button("WriterButton", () => window.location.href = "writer.html");
+const noteContainer = document.getElementById('NoteContainer');
+const addNoteButton = document.getElementById('AddNote');
+const lastSavedTimeElement = document.getElementById('last-saved-time');
+const setIntervalTime = 2000;
+
+let notes = [];
+
+// A button that appears when holding Ctrl key. When clicked, removes all localstorage notes.
+const clearNotesButton = new Button('ClearNotesButton', () => {
+    localStorage.removeItem('notes');
+    notes = [];
+    while (noteContainer.firstChild && noteContainer.firstChild !== addNoteButton) {
+        noteContainer.removeChild(noteContainer.firstChild);
+    }
+});
+
+if (clearNotesButton.element) {
+    clearNotesButton.hide();
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Control') {
+            clearNotesButton.show();
+        }
+        if (event.key === 'Escape') {
+            clearNotesButton.hide();
+        }
+    });
 }
 
 /**
@@ -83,11 +95,12 @@ function createNoteElement(noteID, noteContent = '') {
         return noteItem;
     }
 
-    const removeButton = document.createElement('button');
-    removeButton.textContent = 'Remove';
-    removeButton.classList.add('remove-button');
-
-    removeButton.addEventListener('click', () => {
+    // Remove button as OOP
+    const removeButton = new Button(null, null);
+    removeButton.button = document.createElement('button');
+    removeButton.button.textContent = 'Remove';
+    removeButton.button.classList.add('remove-button');
+    removeButton.button.addEventListener('click', () => {
         const index = notes.findIndex(note => note.ID === noteID);
         if (index > -1) {
             notes.splice(index, 1);
@@ -104,14 +117,48 @@ function createNoteElement(noteID, noteContent = '') {
     });
 
     noteItem.appendChild(textarea);
-    noteItem.appendChild(removeButton);
+    noteItem.appendChild(removeButton.button);
     return noteItem;
+}
+
+/**
+ * Save notes to localStorage and update last saved time
+ */
+function saveNotes() {
+    localStorage.setItem('notes', JSON.stringify(notes));
+    lastSavedTimeElement.textContent = `Last saved: ${new Date().toLocaleTimeString()}`;
+}
+
+/**
+ * Load notes from localStorage and populate the notes array and DOM
+ */
+function clearNoteContainer() {
+    // Remove all notes (but not the add button)
+    while (noteContainer.firstChild) {
+        if (noteContainer.firstChild === addNoteButton) break;
+        noteContainer.removeChild(noteContainer.firstChild);
+    }
 }
 
 /**
  * Load notes from localStorage and populate the notes array and DOM
  */
 function loadNotes() {
+    // Save focus and caret position if a textarea is focused
+    let focusedNoteID = null;
+    let caretPos = null;
+    const active = document.activeElement;
+    if (active && active.tagName === 'TEXTAREA' && active.parentElement && active.parentElement.classList.contains('note-item')) {
+        // Find the note ID by matching textarea value and DOM order
+        const noteItems = Array.from(noteContainer.getElementsByClassName('note-item'));
+        const idx = noteItems.findIndex(item => item.contains(active));
+        if (idx !== -1 && notes[idx]) {
+            focusedNoteID = notes[idx].ID;
+            caretPos = active.selectionStart;
+        }
+    }
+
+    clearNoteContainer();
     const storedNotes = localStorage.getItem('notes');
     if (storedNotes) {
         notes = JSON.parse(storedNotes);
@@ -124,26 +171,34 @@ function loadNotes() {
                 noteContainer.insertBefore(noteElement, addNoteButton);
             }
         });
+        // Restore focus and caret position if possible
+        if (focusedNoteID !== null && !isReader) {
+            const noteItems = Array.from(noteContainer.getElementsByClassName('note-item'));
+            for (let i = 0; i < notes.length; i++) {
+                if (notes[i].ID === focusedNoteID) {
+                    const textarea = noteItems[i]?.querySelector('textarea');
+                    if (textarea) {
+                        textarea.focus();
+                        if (caretPos !== null) textarea.setSelectionRange(caretPos, caretPos);
+                    }
+                    break;
+                }
+            }
+        }
     }
 }
 
 
 document.addEventListener('DOMContentLoaded', () => {
     const isReader = document.querySelector('.note-container.reader') !== null;
-    if (!isReader) {
-        addNoteButton?.addEventListener('click', addNote);
+    if (!isReader && addNoteButton) {
+        addNoteButton.addEventListener('click', addNote);
     }
 
-    [
-        [readerButton, "reader.html"],
-        [writerButton, "writer.html"],
-    ].forEach(([button, url]) => button?.addEventListener("click", () => window.location.href = url));
-
-    backButton?.addEventListener("click", () => window.location.href = "index.html");
-
-    if (!isReader) {
-        setInterval(saveNotes, setIntervalTime);
-    }
+    setInterval(() => {
+        if (!isReader) saveNotes();
+        loadNotes();
+    }, setIntervalTime);
 
     loadNotes();
 });
