@@ -74,6 +74,15 @@ function createNoteElement(noteID, noteContent = '') {
     const textarea = document.createElement('textarea');
     textarea.value = noteContent;
 
+    // Detect if we are in reader mode (readonly, no add/remove)
+    const isReader = document.querySelector('.note-container.reader') !== null;
+
+    if (isReader) {
+        textarea.readOnly = true;
+        noteItem.appendChild(textarea);
+        return noteItem;
+    }
+
     const removeButton = document.createElement('button');
     removeButton.textContent = 'Remove';
     removeButton.classList.add('remove-button');
@@ -96,7 +105,6 @@ function createNoteElement(noteID, noteContent = '') {
 
     noteItem.appendChild(textarea);
     noteItem.appendChild(removeButton);
-
     return noteItem;
 }
 
@@ -107,16 +115,24 @@ function loadNotes() {
     const storedNotes = localStorage.getItem('notes');
     if (storedNotes) {
         notes = JSON.parse(storedNotes);
+        const isReader = document.querySelector('.note-container.reader') !== null;
         notes.forEach(note => {
             const noteElement = createNoteElement(note.ID, note.content);
-            noteContainer.insertBefore(noteElement, addNoteButton);
+            if (isReader) {
+                noteContainer.appendChild(noteElement);
+            } else {
+                noteContainer.insertBefore(noteElement, addNoteButton);
+            }
         });
     }
 }
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    addNoteButton?.addEventListener('click', addNote);
+    const isReader = document.querySelector('.note-container.reader') !== null;
+    if (!isReader) {
+        addNoteButton?.addEventListener('click', addNote);
+    }
 
     [
         [readerButton, "reader.html"],
@@ -125,7 +141,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     backButton?.addEventListener("click", () => window.location.href = "index.html");
 
-    setInterval(saveNotes, setIntervalTime);
+    if (!isReader) {
+        setInterval(saveNotes, setIntervalTime);
+    }
 
     loadNotes();
 });

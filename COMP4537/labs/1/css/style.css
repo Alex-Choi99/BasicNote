@@ -1,3 +1,13 @@
+
+.note-container.reader textarea,
+.note-container.reader textarea:focus,
+.note-container.reader textarea:hover,
+.note-container.reader textarea:active {
+    cursor: default;
+    user-select: none;
+    pointer-events: none;
+}
+
 body {
     display: flex;
     flex-direction: column;
