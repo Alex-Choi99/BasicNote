@@ -1,5 +1,9 @@
 /**
- * Alex Choi A01323994
+ * Name: Alex Choi
+ * Student ID: A01323994
+ * 
+ * Most core logic and design ideas were suggested by Gemini
+ * and I developed the code based on those suggestions to ensure requirements.
  */
 
 /**
@@ -187,7 +191,6 @@ function loadNotes() {
         }
     }
 }
-
 
 document.addEventListener('DOMContentLoaded', () => {
     const isReader = document.querySelector('.note-container.reader') !== null;
